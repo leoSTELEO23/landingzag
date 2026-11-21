@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru" >
+<head>
+    <meta charset="UTF-8">
+    <meta name= "viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сбор заявок</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<!-- временное уведомление"заглушка"-->
+<div id="toast" class="toast">
+    <span class="toast__text">Ваша заявка отправлена!</span>
+</div>
+<body>
+
+        <!--Hero(главная секция)-->
+        <header class="hero">
+            <div class="container">
+                <h1 class="hero_title">ЖК "Поцелуи"</h1>
+                <p class="hero_subtitle">Оставьте заявку,чтобы получить уведомление о старте продаж одним из первых</p>
+            </div>
+        </header>
+
+        <!--info(можно закинуть какую-то инфу по проекту)-->
+        <main>
+            <section class="info">
+                <div class="container">
+                    <h2>О проекте:</h2>
+                    <div class="info_grid">
+                        <div class="info_card">"Поцелуи"- это территория человеческих чувств, внимания и заботы, воплощённая в архитектуре, пространстве и повседневных сценариях жизни.</div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!--Секция с формой(подключить сервис по рассылке)-->
+            <section class="form-section">
+                <div class="container">
+                    <h2>Оставить заявку</h2>
+                    <form id="leadForm" class="lead-form">
+                        <input type="text" name="email" placeholder="Ваш Email" required>
+                        <button type="submit" class="btn-submit">Отправить заявку</button>
+                    </form>
+                    <p id="successMsg" style="display:none; color:green;">Спасибо! Вы в списке.</p>
+                </div>
+            </section>
+        </main>
+    <script src="script.js"></script>
+</body>
+</html>
