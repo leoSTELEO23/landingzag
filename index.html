@@ -6,12 +6,9 @@
     <title>Сбор заявок</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<!-- временное уведомление"заглушка"-->
-<div id="toast" class="toast">
-    <span class="toast__text">Ваша заявка отправлена!</span>
-</div>
-<body>
 
+<body>
+    </div>
         <!--Hero(главная секция)-->
         <header class="hero">
             <div class="container">
@@ -37,13 +34,29 @@
                 <div class="container">
                     <h2>Оставить заявку</h2>
                     <form id="leadForm" class="lead-form">
-                        <input type="text" name="email" placeholder="Ваш Email" required>
-                        <button type="submit" class="btn-submit">Отправить заявку</button>
+                        <input type="email" name="email" placeholder="Email для связи" required>
+            
+                        <div class="consent">
+                            <label class="consent__label">
+                                <input type="checkbox" id="consentCheckbox" class="consent__checkbox" required>
+                                <span class="consent__text">
+                                    Я согласен на 
+                                    <a href="#" class="consent__link">обработку персональных данных</a>
+                                </span>
+                            </label>
+                        </div>
+            
+                        <button type="submit" class="btn-submit" disabled>Отправить заявку</button>
+                        <p id="formStatus" class="form-status"></p>
                     </form>
-                    <p id="successMsg" style="display:none; color:green;">Спасибо! Вы в списке.</p>
                 </div>
             </section>
         </main>
-    <script src="script.js"></script>
+
+        <script src="script.js"></script>
+    <!-- временное уведомление"заглушка"-->
+    <div id="toast" class="toast">
+        <span class="toast__text">Ваша заявка отправлена!</span>
+    </div>    
 </body>
 </html>
