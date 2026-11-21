@@ -1,64 +1,104 @@
 <!DOCTYPE html>
-<html lang="ru" >
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name= "viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сбор заявок</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЖК «Поцелуи» — уведомление о старте продаж</title>
+    <meta name="description" content="Оставьте email, чтобы получить уведомление о старте продаж ЖК «Поцелуи» одним из первых.">
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    </div>
-        <!--Hero(главная секция)-->
-        <header class="hero">
+    <!-- Главная секция -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero__title">ЖК «Поцелуи»</h1>
+            <p class="hero__subtitle">Оставьте заявку, чтобы получить уведомление о старте продаж одним из первых</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- О проекте -->
+        <section class="info">
             <div class="container">
-                <h1 class="hero_title">ЖК "Поцелуи"</h1>
-                <p class="hero_subtitle">Оставьте заявку,чтобы получить уведомление о старте продаж одним из первых</p>
-            </div>
-        </header>
-
-        <!--info(можно закинуть какую-то инфу по проекту)-->
-        <main>
-            <section class="info">
-                <div class="container">
-                    <h2>О проекте:</h2>
-                    <div class="info_grid">
-                        <div class="info_card">"Поцелуи"- это территория человеческих чувств, внимания и заботы, воплощённая в архитектуре, пространстве и повседневных сценариях жизни.</div>
-                    </div>
+                <h2>О проекте:</h2>
+                <div class="info__grid">
+                    <div class="info__card">«Поцелуи» — это территория человеческих чувств, внимания и заботы, воплощённая в архитектуре, пространстве и повседневных сценариях жизни.</div>
                 </div>
+            </div>
+        </section>
 
-            </section>
-
-            <!--Секция с формой(подключить сервис по рассылке)-->
-            <section class="form-section">
-                <div class="container">
+        <!-- Форма -->
+        <section class="form-section" id="form">
+            <div class="container">
+                <div class="form-box">
                     <h2>Оставить заявку</h2>
-                    <form id="leadForm" class="lead-form">
-                        <input type="name" name="name" placeholder="Ваше имя">
-                        <input type="email" name="email" placeholder="Email для связи" required>
-                     
-            
+                    <form id="leadForm" class="lead-form" novalidate>
+                        <label for="email" class="visually-hidden">Email</label>
+                        <input type="email" id="email" name="email"
+                               placeholder="Email для уведомления" autocomplete="email" required>
+
+                        <!-- Мёд -->
+                        <div class="hp" aria-hidden="true">
+                            <label for="website">Не заполняйте это поле</label>
+                            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                        </div>
+
                         <div class="consent">
                             <label class="consent__label">
                                 <input type="checkbox" id="consentCheckbox" class="consent__checkbox" required>
                                 <span class="consent__text">
-                                    Я согласен на 
-                                    <a href="#" class="consent__link">обработку персональных данных</a>
+                                    Я даю <a href="consent.html" target="_blank" rel="noopener">согласие на обработку
+                                    персональных данных</a> (email) для получения уведомления о старте продаж
+                                    ЖК «Поцелуи» и ознакомлен(а) с
+                                    <a href="privacy.html" target="_blank" rel="noopener">политикой обработки
+                                    персональных данных</a>
                                 </span>
                             </label>
                         </div>
-            
+
                         <button type="submit" class="btn-submit" disabled>Отправить заявку</button>
-                        <p id="formStatus" class="form-status"></p>
+                        <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
                     </form>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
+    </main>
 
-        <script src="script.js"></script>
-    <!-- временное уведомление"заглушка"-->
-    <div id="toast" class="toast">
-        <span class="toast__text">Ваша заявка отправлена!</span>
-    </div>    
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__grid">
+                <div class="footer__col">
+                    <p class="footer__brand">Название организации</p>
+                    <p>ООО «Название» / ФИО ИП</p>
+                    <p>ИНН  · ОГРН </p>
+                    <p>[Адрес организации]</p>
+                </div>
+                <div class="footer__col">
+                    <p class="footer__title">Контакты</p>
+                    <p><a href="mailto:info@example.ru"></a></p>
+                    <p><a href="tel:+70000000000"></a></p>
+                </div>
+                <div class="footer__col">
+                    <p class="footer__title">Документы</p>
+                    <p><a href="privacy.html">Политика обработки персональных данных</a></p>
+                    <p><a href="consent.html">Согласие на обработку персональных данных</a></p>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <p>© 2026 ЖК «Поцелуи». Информация на сайте не является публичной офертой.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Временное уведомление -->
+    <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="toast__text">Спасибо! Вы в списке.</span>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
