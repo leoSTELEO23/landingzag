@@ -7,17 +7,28 @@
     <meta name="description" content="Оставьте email, чтобы получить уведомление о старте продаж ЖК «Поцелуи» одним из первых.">
     <meta name="theme-color" content="#1a1a1a">
     <link rel="icon" href="data:,">
+    <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('js-intro')</script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <!-- Фиксированный фон -->
+    <div class="sky" aria-hidden="true"></div>
+
     <!-- Главная секция -->
-    <header class="hero">
-        <div class="container">
-            <h1 class="hero__title">ЖК «Поцелуи»</h1>
-            <p class="hero__subtitle">Оставьте заявку, чтобы получить уведомление о старте продаж одним из первых</p>
+    <div class="intro" id="intro">
+        <div class="intro__stage">
+            <header class="hero">
+                <div class="container">
+                    <h1 class="hero__title">ЖК «Поцелуи»</h1>
+                    <p class="hero__subtitle">Оставьте заявку, чтобы получить уведомление о старте продаж одним из первых</p>
+                </div>
+            </header>
+            <div class="intro__clouds intro__clouds--l" aria-hidden="true"></div>
+            <div class="intro__clouds intro__clouds--r" aria-hidden="true"></div>
+            <p class="intro__hint" aria-hidden="true">Прокрутите вниз</p>
         </div>
-    </header>
+    </div>
 
     <main>
         <!-- О проекте -->

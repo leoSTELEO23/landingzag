@@ -1,3 +1,42 @@
+// Интро: облака раздвигаются при скролле, затем проявляется hero
+(function initIntro() {
+    const intro = document.getElementById('intro');
+    if (!intro || !document.documentElement.classList.contains('js-intro')) return;
+
+    const root = document.documentElement;
+    let target = 0;
+    let current = 0;
+    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    function read() {
+        const rect = intro.getBoundingClientRect();
+        const distance = intro.offsetHeight - window.innerHeight;
+        target = Math.min(1, Math.max(0, -rect.top / distance));
+    }
+
+    function tick() {
+        current += (target - current) * 0.12;
+        if (Math.abs(target - current) < 0.0005) current = target;
+        const p = ease(current);
+        const ui = Math.min(1, Math.max(0, (p - 0.45) / 0.4));
+        root.style.setProperty('--p', p.toFixed(4));
+        root.style.setProperty('--ui', ui.toFixed(3));
+        requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('scroll', read, { passive: true });
+    window.addEventListener('resize', read);
+    read();
+    tick();
+
+    // Показываем сцену, когда облака загрузились (или через 2,5 с)
+    const ready = () => intro.classList.add('is-ready');
+    const img = new Image();
+    img.onload = img.onerror = ready;
+    img.src = 'assets/intro-clouds.webp';
+    setTimeout(ready, 2500);
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('leadForm');
     const consentCheckbox = document.getElementById('consentCheckbox');
