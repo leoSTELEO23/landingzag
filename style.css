@@ -345,7 +345,7 @@ h2 { font-size: 1.75rem; text-align: center; text-shadow: 0 2px 8px rgba(0, 0, 0
 .js-intro .intro__hint {
     display: block; position: absolute; z-index: 3; left: 0; right: 0;
     bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-    text-align: center; font-size: 1rem; letter-spacing: 0.02em;
+    text-align: center; font-size: 1rem; letter-spacing: 0.05em;
     text-shadow: 0 1px 12px rgba(40, 50, 90, 0.5);
     opacity: calc(1 - var(--p) * 8); pointer-events: none;
 }
