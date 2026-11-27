@@ -1,42 +1,83 @@
-// Интро: облака раздвигаются при скролле, затем проявляется hero
+// 1. ИНТРО: один жест вниз запускает анимацию, пока она идёт, скролл заблокирован
 (function initIntro() {
-    const intro = document.getElementById('intro');
-    if (!intro || !document.documentElement.classList.contains('js-intro')) return;
-
     const root = document.documentElement;
-    let target = 0;
-    let current = 0;
-    const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    const intro = document.getElementById('intro');
+    if (!intro || !root.classList.contains('js-intro')) return;
 
-    function read() {
-        const rect = intro.getBoundingClientRect();
-        const distance = intro.offsetHeight - window.innerHeight;
-        target = Math.min(1, Math.max(0, -rect.top / distance));
-    }
+    const DURATION = 3200;
+    const AUTO_START_MS = 6000; // если пользователь ничего не делает
+    let started = false;
+    let startTime = null;
 
-    function tick() {
-        current += (target - current) * 0.12;
-        if (Math.abs(target - current) < 0.0005) current = target;
-        const p = ease(current);
-        const ui = Math.min(1, Math.max(0, (p - 0.45) / 0.4));
+    // Всегда начинаем сверху и блокируем скролл с первой секунды
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    root.classList.add('intro-lock');
+
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    function tick(now) {
+        if (startTime === null) startTime = now;
+        const raw = Math.min(1, (now - startTime) / DURATION);
+        const p = easeOutCubic(raw);
+        const ui = Math.min(1, Math.max(0, (p - 0.5) / 0.35));
         root.style.setProperty('--p', p.toFixed(4));
         root.style.setProperty('--ui', ui.toFixed(3));
+        if (raw < 1) requestAnimationFrame(tick);
+        else finish();
+    }
+
+    function finish() {
+        root.style.setProperty('--p', '1');
+        root.style.setProperty('--ui', '1');
+        root.classList.remove('intro-lock');
+        root.classList.add('intro-done'); // скрывает облака и подсказку, hero остаётся в потоке
+        removeListeners();
+    }
+
+    function start() {
+        if (started) return;
+        started = true;
+        removeListeners();
         requestAnimationFrame(tick);
     }
 
-    window.addEventListener('scroll', read, { passive: true });
-    window.addEventListener('resize', read);
-    read();
-    tick();
+    // Намерение «листать вниз»: колесо, свайп вверх, клавиши
+    let touchY = null;
+    const onWheel = (e) => { if (e.deltaY > 0) start(); };
+    const onTouchStart = (e) => { touchY = e.touches[0].clientY; };
+    const onTouchMove = (e) => {
+        if (touchY !== null && touchY - e.touches[0].clientY > 10) start();
+    };
+    const onKey = (e) => {
+        if (['ArrowDown', 'PageDown', 'End', ' ', 'Tab'].includes(e.key)) {
+            e.preventDefault();
+            start();
+        }
+    };
+    function removeListeners() {
+        window.removeEventListener('wheel', onWheel);
+        window.removeEventListener('touchstart', onTouchStart);
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('keydown', onKey);
+    }
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKey);
 
-    // Показываем сцену, когда облака загрузились (или через 2,5 с)
-    const ready = () => intro.classList.add('is-ready');
+    // Показываем облака, когда картинка загрузилась (или через 2,5 с)
+    const ready = () => root.classList.add('intro-ready');
     const img = new Image();
     img.onload = img.onerror = ready;
     img.src = 'assets/intro-clouds.webp';
     setTimeout(ready, 2500);
+
+    setTimeout(start, AUTO_START_MS);
 })();
 
+
+// 2. ФОРМА И ВАЛИДАЦИЯ
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('leadForm');
     const consentCheckbox = document.getElementById('consentCheckbox');
@@ -44,11 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusEl = document.getElementById('formStatus');
     const toast = document.getElementById('toast');
 
-    // Адрес серверной функции или endpoint формы подписки.
-    // ВАЖНО: пока пусто, заявки НЕ сохраняются (режим демо).
-    // API-ключ сервиса рассылок в этот файл класть нельзя.
-    const ENDPOINT = '';
-    const CONSENT_VERSION = '2026-11-21'; // меняйте при изменении текста согласия
+    const ENDPOINT = ''; // Сюда вставишь ссылку от сервиса рассылок
+    const CONSENT_VERSION = '2026-11-21'; 
     const MIN_FILL_TIME_MS = 2500;
     const TIMEOUT_MS = 10000;
 
@@ -56,11 +94,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let toastTimer;
     let isSending = false;
 
-    function showToast(message) {
+    // Маскот в уведомлении: у каждого состояния своя поза
+    const TOAST_TYPES = {
+        success: { title: 'Заявка принята', img: 'assets/mascot-success.webp' },
+        warning: { title: 'Нужно согласие', img: 'assets/mascot-warning.webp' },
+        error: { title: 'Что-то пошло не так', img: 'assets/mascot-error.webp' }
+    };
+    Object.values(TOAST_TYPES).forEach((t) => { new Image().src = t.img; }); // предзагрузка
+
+    function showToast(message, type = 'success') {
         clearTimeout(toastTimer);
+        const t = TOAST_TYPES[type] || TOAST_TYPES.success;
+        toast.dataset.type = type;
+        toast.querySelector('.toast__mascot').src = t.img;
+        toast.querySelector('.toast__title').textContent = t.title;
         toast.querySelector('.toast__text').textContent = message;
+        toast.classList.remove('toast--visible');
+        void toast.offsetWidth; // перезапуск анимации маскота
         toast.classList.add('toast--visible');
-        toastTimer = setTimeout(() => toast.classList.remove('toast--visible'), 3000);
+        toastTimer = setTimeout(() => toast.classList.remove('toast--visible'), 4500);
     }
 
     function updateButton() {
@@ -73,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function sendLead(payload) {
         if (!ENDPOINT) {
-            console.warn('ENDPOINT не задан: заявка не отправлена (демо-режим).');
+            console.warn('Демо-режим: заявка не отправлена.');
             await new Promise((resolve) => setTimeout(resolve, 800));
             return;
         }
@@ -100,20 +152,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSending) return;
 
         if (!consentCheckbox.checked) {
-            showToast('Пожалуйста, дайте согласие на обработку данных');
+            showToast('Пожалуйста, дайте согласие на обработку данных', 'warning');
             return;
         }
 
         const email = form.elements['email'].value.trim();
         if (!isValidEmail(email)) {
             statusEl.textContent = 'Проверьте адрес email.';
+            showToast('Проверьте адрес email', 'error');
             return;
         }
 
-        // Бот: заполнено скрытое поле или форма отправлена слишком быстро.
-        // Показываем «успех», но ничего не отправляем.
         const honeypot = form.elements['website'];
         const tooFast = Date.now() - pageLoadedAt < MIN_FILL_TIME_MS;
+        
         if ((honeypot && honeypot.value.trim() !== '') || tooFast) {
             showToast('Спасибо! Вы в списке.');
             form.reset();
@@ -123,6 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = {
             email,
+            phone: form.elements['phone'].value.trim(),
+            name: form.elements['name'].value.trim(),
             consent: {
                 given: true,
                 version: CONSENT_VERSION,
@@ -142,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             form.reset();
         } catch (error) {
             statusEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз позже.';
-            showToast('Ошибка. Попробуйте ещё раз.');
+            showToast('Ошибка. Попробуйте ещё раз.', 'error');
         } finally {
             isSending = false;
             submitBtn.textContent = 'Отправить заявку';
@@ -150,3 +204,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// 3. Плавное появление блоков при прокрутке
+(function initReveal() {
+    const items = document.querySelectorAll('.reveal');
+    if (!items.length || !('IntersectionObserver' in window) ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('reveal-on');
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                io.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    items.forEach((el) => io.observe(el));
+})();

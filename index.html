@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="page-home">
+    <!-- Спрайт знаков: логотип и три знака башен (воссозданы по брендбуку) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs><linearGradient id="gBrand" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f78c3b"/><stop offset="1" stop-color="#eb539c"/></linearGradient></defs>
+        <symbol id="mark" viewBox="0 0 175 100"><g fill="url(#gBrand)"><path d="M31 20A31 30 0 0 0 31 80Z"/><path d="M76 7A39 43 0 0 0 76 93Z"/><circle cx="125" cy="50" r="50"/></g></symbol>
+        <symbol id="s-pull" viewBox="0 0 100 100"><rect x="6" y="6" width="88" height="88" fill="none"/><path d="M47 24A22 26 0 0 0 47 76Z"/><path d="M94 6A38 44 0 0 0 94 94Z"/></symbol>
+        <symbol id="s-close" viewBox="0 0 100 100"><rect x="6" y="6" width="88" height="88" fill="none"/><path d="M6 94V60Q6 52 30 50V76Q44 48 94 46V94Z"/></symbol>
+        <symbol id="s-together" viewBox="0 0 100 100"><rect x="6" y="6" width="88" height="88" fill="none"/><circle cx="50" cy="50" r="38"/></symbol>
+    </svg>
+
     <!-- Фиксированный фон -->
     <div class="sky" aria-hidden="true"></div>
 
@@ -21,8 +30,16 @@
         <div class="intro__stage">
             <header class="hero">
                 <div class="container">
-                    <h1 class="hero__title">Поцелуи</h1>
-                    <p class="hero__subtitle">Оставьте заявку, чтобы получить уведомление о старте продаж одним из первых</p>
+                    <svg class="hero__mark" viewBox="0 0 175 100" aria-hidden="true"><use href="#mark"/></svg>
+                    <h1 class="hero__title">поцелуи</h1>
+                    <p class="hero__subtitle">Сила притяжения</p>
+                    <div class="hero__signs" aria-hidden="true">
+                        <svg class="sign" viewBox="0 0 100 100"><use href="#s-pull"/></svg>
+                        <svg class="sign" viewBox="0 0 100 100"><use href="#s-close"/></svg>
+                        <svg class="sign" viewBox="0 0 100 100"><use href="#s-together"/></svg>
+                    </div>
+                    <p class="hero__note">Жилой квартал в Хабаровске. Скоро старт продаж</p>
+                    <a class="btn-cta" href="#form">Узнать о старте продаж</a>
                 </div>
             </header>
             <div class="intro__clouds intro__clouds--l" aria-hidden="true"></div>
@@ -34,10 +51,40 @@
     <main>
         <!-- О проекте -->
         <section class="info">
-            <div class="container">
-                <h2>О проекте:</h2>
+            <div class="container reveal">
+                <span class="eyebrow">О проекте</span>
+                <h2>Территория человеческих чувств</h2>
                 <div class="info__grid">
                     <div class="info__card">Поцелуи — это территория человеческих чувств, внимания и заботы, воплощённая в архитектуре, пространстве и повседневных сценариях жизни.</div>
+                </div>
+                <ul class="tags" aria-label="Характер бренда">
+                    <li>Тёплый</li><li>Открытый</li><li>Внимательный</li><li>Живой</li><li>Уверенный</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Три башни -->
+        <section class="towers">
+            <div class="container reveal">
+                <span class="eyebrow">Притяжение → Сближение → Вместе</span>
+                <h2>Три башни — три состояния</h2>
+                <p class="towers__lead">Каждая башня обладает собственной идентичностью, но все они воспринимаются как части одного целого.</p>
+                <div class="towers__grid">
+                    <article class="tower tower--pull">
+                        <svg class="sign sign--solid" viewBox="0 0 100 100" aria-hidden="true"><use href="#s-pull"/></svg>
+                        <h3>Притяжение</h3>
+                        <p>Взаимное притяжение, энергия, эмоциональная связь.</p>
+                    </article>
+                    <article class="tower tower--close">
+                        <svg class="sign sign--solid" viewBox="0 0 100 100" aria-hidden="true"><use href="#s-close"/></svg>
+                        <h3>Сближение</h3>
+                        <p>Движение навстречу, контакт, взаимодействие.</p>
+                    </article>
+                    <article class="tower tower--together">
+                        <svg class="sign sign--solid" viewBox="0 0 100 100" aria-hidden="true"><use href="#s-together"/></svg>
+                        <h3>Вместе</h3>
+                        <p>Единство, целостность, близость.</p>
+                    </article>
                 </div>
             </div>
         </section>
@@ -46,6 +93,7 @@
         <section class="form-section" id="form">
             <div class="container">
                 <div class="form-box">
+                    <span class="eyebrow">Скоро старт продаж</span>
                     <h2>Оставить заявку</h2>
                     <form id="leadForm" class="lead-form" novalidate>
 
@@ -88,6 +136,12 @@
         </section>
     </main>
 
+    <section class="outro">
+        <div class="container reveal">
+            <h2>Этому городу точно нужны <span class="grad-text">поцелуи</span></h2>
+        </div>
+    </section>
+
     <!-- Футер -->
     <footer class="footer">
         <div class="container">
@@ -112,7 +166,9 @@
     </footer>
 
     <!-- Временное уведомление -->
-    <div id="toast" class="toast" role="status" aria-live="polite">
+    <div id="toast" class="toast" role="status" aria-live="polite" data-type="success">
+        <img class="toast__mascot" src="assets/mascot-success.webp" alt="" width="120" height="116">
+        <span class="toast__title">Заявка принята</span>
         <span class="toast__text">Спасибо! Вы в списке.</span>
     </div>
 
