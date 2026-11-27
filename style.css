@@ -518,3 +518,6 @@ html { scroll-behavior: smooth; }
 }
 @media (max-width: 600px) { .toast { left: 15px; right: 15px; bottom: 20px; width: auto; } }
 @media (prefers-reduced-motion: reduce) { .toast--visible .toast__mascot { animation: none; } }
+
+/* Подсветка поля с ошибкой */
+.lead-form input[aria-invalid="true"] { border-color: #ff8aa8; box-shadow: 0 0 0 3px rgba(255, 138, 168, 0.35); }

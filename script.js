@@ -102,12 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     Object.values(TOAST_TYPES).forEach((t) => { new Image().src = t.img; }); // предзагрузка
 
-    function showToast(message, type = 'success') {
+    function showToast(message, type = 'success', title) {
         clearTimeout(toastTimer);
         const t = TOAST_TYPES[type] || TOAST_TYPES.success;
         toast.dataset.type = type;
         toast.querySelector('.toast__mascot').src = t.img;
-        toast.querySelector('.toast__title').textContent = t.title;
+        toast.querySelector('.toast__title').textContent = title || t.title;
         toast.querySelector('.toast__text').textContent = message;
         toast.classList.remove('toast--visible');
         void toast.offsetWidth; // перезапуск анимации маскота
@@ -122,6 +122,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function isValidEmail(value) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
     }
+
+    // Телефон: только цифры, пробелы, дефисы, скобки и «+» в начале; от 10 до 15 цифр
+    function isValidPhone(value) {
+        if (!/^\+?[\d\s\-()]+$/.test(value)) return false;
+        const digits = value.replace(/\D/g, '');
+        return digits.length >= 10 && digits.length <= 15;
+    }
+
+    function markInvalid(input) {
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+    }
+
+    const phoneInput = form.elements['phone'];
+    const emailInput = form.elements['email'];
+
+    // Нельзя ввести буквы и прочий мусор (в том числе вставкой и автозаполнением)
+    phoneInput.addEventListener('input', () => {
+        let v = phoneInput.value.replace(/[^\d+\s\-()]/g, '');
+        v = v.replace(/(?!^)\+/g, ''); // «+» только в начале
+        if (v !== phoneInput.value) phoneInput.value = v;
+        phoneInput.removeAttribute('aria-invalid');
+    });
+    emailInput.addEventListener('input', () => emailInput.removeAttribute('aria-invalid'));
 
     async function sendLead(payload) {
         if (!ENDPOINT) {
@@ -156,12 +180,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const email = form.elements['email'].value.trim();
-        if (!isValidEmail(email)) {
-            statusEl.textContent = 'Проверьте адрес email.';
-            showToast('Проверьте адрес email', 'error');
+        const phone = phoneInput.value.trim();
+        if (!isValidPhone(phone)) {
+            statusEl.textContent = 'Проверьте номер телефона.';
+            markInvalid(phoneInput);
+            showToast('Введите номер в формате +7 900 123-45-67', 'error', 'Проверьте номер');
             return;
         }
+
+        const email = emailInput.value.trim();
+        if (!isValidEmail(email)) {
+            statusEl.textContent = 'Проверьте адрес email.';
+            markInvalid(emailInput);
+            showToast('Введите адрес в формате name@mail.ru', 'error', 'Проверьте email');
+            return;
+        }
+        statusEl.textContent = '';
 
         const honeypot = form.elements['website'];
         const tooFast = Date.now() - pageLoadedAt < MIN_FILL_TIME_MS;
@@ -175,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const payload = {
             email,
-            phone: form.elements['phone'].value.trim(),
+            phone,
             name: form.elements['name'].value.trim(),
             consent: {
                 given: true,
